@@ -79,7 +79,7 @@ class Chat extends Base {
          * Last message fo chat
          * @type {Message}
          */
-        this.lastMessage = data.lastMessage ? new Message(super.client, data.lastMessage) : undefined;
+        this.lastMessage = data.lastMessage ? new Message(this.client, data.lastMessage) : undefined;
         
         return super._patch(data);
     }
@@ -187,7 +187,7 @@ class Chat extends Base {
                 if (m.isNotification) {
                     return false; // dont include notification messages
                 }
-                if (searchOptions && searchOptions.fromMe && m.id.fromMe !== searchOptions.fromMe) {
+                if (searchOptions && searchOptions.fromMe !== undefined && m.id.fromMe !== searchOptions.fromMe) {
                     return false;
                 }
                 return true;
@@ -260,6 +260,23 @@ class Chat extends Base {
      */
     async getLabels() {
         return this.client.getChatLabels(this.id._serialized);
+    }
+
+    /**
+     * Add or remove labels to this Chat
+     * @param {Array<number|string>} labelIds
+     * @returns {Promise<void>}
+     */
+    async changeLabels(labelIds) {
+        return this.client.addOrRemoveLabels(labelIds, [this.id._serialized]);
+    }
+
+    /**
+     * Sync chat history conversation
+     * @return {Promise<boolean>} True if operation completed successfully, false otherwise.
+     */
+    async syncHistory() {
+        return this.client.syncHistory(this.id._serialized);
     }
 }
 
